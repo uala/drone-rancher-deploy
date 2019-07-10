@@ -2,6 +2,10 @@
 
 This [drone plugin](https://drone.io/) can be used to deploy images on a Kubernetes cluster with Rancher 2.x.
 
+Plugin in action:
+
+![Execution](/example.png)
+
 ## Usage
 
 In order to use this plugin in one your Drone steps you can use the following step definition
