@@ -1,4 +1,5 @@
 # Sample configuration file
 sample-config.yml
+sample-env
 # Ruby and IDE stuff
 .idea/

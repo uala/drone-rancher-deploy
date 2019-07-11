@@ -40,6 +40,24 @@ def shell
   @_cmd ||= TTY::Command.new(logger: logger, dry_run: dry_run?, color: color?)
 end
 
+def on_tag?
+  !ENV['DRONE_TAG'].to_s.empty?
+end
+
+def should_deploy?(name, config, current_branch)
+  # Skip dot names, used for templates
+  return false if name.start_with?('.')
+  # Check for tag deployments
+  if on_tag?
+    logger.debug "Running on git tag, checking tag flag #{config['only_tags']}"
+    return config['only_tags'] === true
+  end
+  # Generic match based on regexp
+  regexp = Regexp.new("^#{config['branch']}$")
+  logger.debug "Matching branch regexp #{regexp} with current branch #{current_branch}: #{regexp.match?(current_branch)}"
+  regexp.match?(current_branch) && config['only_tags'] != true
+end
+
 def echo_1
   StringIO.new.tap do |st|
     st.puts '1'
@@ -56,11 +74,7 @@ logger.info "Reading plugin configuration from file #{ENV['PLUGIN_CONFIG']}"
 APP_CONFIG = YAML.load(ERB.new(File.read(ENV['PLUGIN_CONFIG'])).result)
 
 # Find applicable configurations, using branch key of configuration and skip templates starting with dots
-environments = APP_CONFIG.reject { |name, _| name.start_with?('.') }.select do |_, config|
-  regexp = Regexp.new("^#{config['branch']}$")
-  logger.debug "Matching branch regexp #{regexp} with current branch #{current_branch}: #{regexp.match?(current_branch)}"
-  regexp.match?(current_branch)
-end
+environments = APP_CONFIG.select { |name, config| should_deploy?(name, config, current_branch) }
 
 # Check applicable envs
 if environments.empty?

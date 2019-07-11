@@ -76,6 +76,8 @@ production:
 configuration must be deployed. It supports plain branch names and also a regexp (e.g. `feature/.*`). At 
  [DRONE_SOURCE_BRANCH](https://docs.drone.io/reference/environ/drone-source-branch/) will be used to match, in order
  to support both `push` and `pull_request` events in Drone.io.
+* `only_tags`: if true this configuration will be executed if and only if current deploy is running on a tag
+(n.b. it will **NOT** deploy even if branch regexp matches)
 * `server_url`: Your Rancher 2.x server url, mandatory
 * `project`: Rancher project name, used for context switch
 * `namespace`: Rancher namespace 
