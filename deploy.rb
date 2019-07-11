@@ -8,10 +8,6 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 
-# Check current branch
-current_branch = ENV['DRONE_SOURCE_BRANCH']
-logger.debug %Q{Running plugin for branch "#{current_branch}"}
-logger.info "Reading plugin configuration from file #{ENV['PLUGIN_CONFIG']}"
 
 
 # Check applicable envs

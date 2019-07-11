@@ -15,11 +15,13 @@ module RancherDeployer
 
     def initialize
       @config = {}
+      @current_branch = ENV.fetch('DRONE_SOURCE_BRANCH')
+      logger.debug %Q{Running plugin for branch "#{current_branch}"}
     end
 
     def load_config!
       config_file = validate_config!
-      logger.debug { "Reading configuration from #{config_file}" }
+      logger.info "Reading plugin configuration from file #{config_file}"
       # Parse configuration file also using ERB
       @config = YAML.load(ERB.new(File.read(config_file)).result)
     end

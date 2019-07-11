@@ -1,5 +1,6 @@
 RSpec.describe RancherDeployer::Deployer do
   before { stub_env 'PLUGIN_LOGGING', 'error' }
+  before { stub_env 'DRONE_SOURCE_BRANCH', 'develop' }
 
   describe '#load_config!' do
     context 'when config file is not set' do
@@ -66,12 +67,19 @@ RSpec.describe RancherDeployer::Deployer do
 
       context 'when using regexp' do
         let(:current_branch) { 'feature/foo' }
-        
+
         it 'should select matching branches using the given regexp' do
           expect(subject.environments.keys).to include('feature')
         end
       end
 
+    end
+  end
+
+  describe '#current_branch' do
+    before { stub_env 'DRONE_SOURCE_BRANCH', 'master' }
+    it 'should fetch it from DRONE_SOURCE_BRANCH' do
+      expect(subject.current_branch).to eq('master')
     end
   end
 
