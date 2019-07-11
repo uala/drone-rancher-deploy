@@ -8,28 +8,11 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 
-def should_deploy?(name, config, current_branch)
-  # Skip dot names, used for templates
-  return false if name.start_with?('.')
-  # Check for tag deployments
-  if on_tag?
-    logger.debug "Running on git tag, checking tag flag #{config['only_tags']}"
-    return config['only_tags'] === true
-  end
-  # Generic match based on regexp
-  regexp = Regexp.new("^#{config['branch']}$")
-  logger.debug "Matching branch regexp #{regexp} with current branch #{current_branch}: #{regexp.match?(current_branch)}"
-  regexp.match?(current_branch) && config['only_tags'] != true
-end
-
 # Check current branch
 current_branch = ENV['DRONE_SOURCE_BRANCH']
 logger.debug %Q{Running plugin for branch "#{current_branch}"}
 logger.info "Reading plugin configuration from file #{ENV['PLUGIN_CONFIG']}"
 
-
-# Find applicable configurations, using branch key of configuration and skip templates starting with dots
-environments = APP_CONFIG.select { |name, config| should_deploy?(name, config, current_branch) }
 
 # Check applicable envs
 if environments.empty?

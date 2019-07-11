@@ -11,7 +11,7 @@ module RancherDeployer
   MissingConfig = Class.new(Error)
 
   class Deployer
-    attr_reader :logger, :config
+    attr_reader :logger, :config, :current_branch
 
     def initialize
       @config = {}
@@ -22,6 +22,11 @@ module RancherDeployer
       logger.debug { "Reading configuration from #{config_file}" }
       # Parse configuration file also using ERB
       @config = YAML.load(ERB.new(File.read(config_file)).result)
+    end
+
+    def environments
+      load_config! if config.empty?
+      config.select { |name, config| should_deploy?(name, config) }
     end
 
     # Image name to use for new deployment
@@ -49,6 +54,21 @@ module RancherDeployer
     end
 
     private
+
+    # Predicate used to check if a configuration must be deployed
+    def should_deploy?(name, config)
+      # Skip dot names, used for templates
+      return false if name.start_with?('.')
+      # Check for tag deployments
+      if on_tag?
+        logger.debug "Running on git tag, checking tag flag #{config['only_tags']}"
+        return config['only_tags'] === true
+      end
+      # Generic match based on regexp
+      regexp = Regexp.new("^#{config['branch']}$")
+      logger.debug "Matching branch regexp #{regexp} with current branch #{current_branch}: #{regexp.match?(current_branch)}"
+      regexp.match?(current_branch) && config['only_tags'] != true
+    end
 
     # Return a shell wrapper
     def shell

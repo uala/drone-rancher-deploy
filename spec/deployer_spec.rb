@@ -38,6 +38,43 @@ RSpec.describe RancherDeployer::Deployer do
     end
   end
 
+  describe '#environments' do
+    let(:current_branch) { 'develop' }
+    before { stub_env 'PLUGIN_CONFIG', "#{__dir__}/config.yml" }
+    before { allow(subject).to receive(:current_branch).and_return(current_branch) }
+
+    it 'select all applicable environments' do
+      expect(subject.environments.size).to be > 0
+    end
+
+    context 'when on tag' do
+      before { allow(subject).to receive(:on_tag?).and_return(true) }
+      it 'should only deploy configs with only_tags' do
+        expect(subject.environments.keys).to match_array('production')
+      end
+    end
+
+    context 'when in branches' do
+      before { allow(subject).to receive(:on_tag?).and_return(false) }
+      it 'should not select dot configs' do
+        expect(subject.environments.keys).not_to include('.env-config')
+      end
+
+      it 'should not select matching branches with only_tag option' do
+        expect(subject.environments.keys).not_to include('production')
+      end
+
+      context 'when using regexp' do
+        let(:current_branch) { 'feature/foo' }
+        
+        it 'should select matching branches using the given regexp' do
+          expect(subject.environments.keys).to include('feature')
+        end
+      end
+
+    end
+  end
+
   describe '#image_name' do
     context 'when set in config' do
       before { allow(subject).to receive(:config).and_return('image' => 'some:latest') }
