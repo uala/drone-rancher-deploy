@@ -40,10 +40,6 @@ def shell
   @_cmd ||= TTY::Command.new(logger: logger, dry_run: dry_run?, color: color?)
 end
 
-def on_tag?
-  !ENV['DRONE_TAG'].to_s.empty?
-end
-
 def should_deploy?(name, config, current_branch)
   # Skip dot names, used for templates
   return false if name.start_with?('.')
