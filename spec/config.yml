@@ -1,0 +1,30 @@
+# Sample file that will use all options
+
+# Reusable configuration
+.env-config: &env-config
+  branch: .* # Anything
+  server_url: "https://k8s.example.com"
+  project: MyCoolProject
+  namespace: backend
+  access_key: <%= ENV['RANCHER_ACCESS_KEY'] %>
+  secret_key: <%= ENV['RANCHER_SECRET_KEY'] %>
+  services:
+    - web
+    - worker
+
+develop:
+  <<: *env-config
+  branch: develop
+
+feature:
+  branch: feature/.*
+
+env1:
+  <<: *env-config
+  branch: my-cool-branch # Regepx may be used here
+
+# Production configuration point on tags
+production:
+  <<: *env-config
+  branch: do-not-deploy-yet
+  only_tags: true

@@ -11,12 +11,14 @@ ENV GEM_HOME="/usr/local/bundle"
 ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
 
 WORKDIR /plugin
-ADD Gemfile* /plugin/
+# Files that will change bundle dependencies
+ADD Gemfile* *.gemspec /plugin/
+ADD lib/rancher_deployer/version.rb /plugin/lib/rancher_deployer/
 # Fix used Gemfile for plugin execution
-ENV BUNDLE_GEMFILE=/plugin/Gemfile
 RUN bundle install
-
-# Add plugin code
-ADD deploy.rb /plugin/
-# Default program
-ENTRYPOINT /bin/bash -l -c 'bundle exec /plugin/deploy.rb'
+# Add the whole plugin
+ADD . /plugin
+# Install built gem locally
+RUN bundle exec rake install
+# By default execute plugin code
+CMD 'rancher-deployer'

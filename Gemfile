@@ -1,7 +1,6 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-# master gems
-ruby '2.6.2'
-gem 'awesome_print'
-gem 'pry'
-gem 'tty-command'
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+
+# Specify your gem's dependencies in rancher_deployer.gemspec
+gemspec
