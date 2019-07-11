@@ -60,7 +60,7 @@ module RancherDeployer
 
     def deploy!
       # If no enviroments applicable ENVs will exit with status code 1
-      logger.warn("No matching environments for #{current_branch}, deploy won't happen") and ::Kernel.exit 1 if environments.empty?
+      logger.warn("No matching environments for #{current_branch}, deploy won't happen") and return if environments.empty?
       # Actual deploy
       logger.info "Will deploy to environment(s): #{environments.keys}"
       # Iterate through configurations and deploy services

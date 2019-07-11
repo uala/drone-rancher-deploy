@@ -84,17 +84,10 @@ RSpec.describe RancherDeployer::Deployer do
   end
 
   describe '#deploy!' do
-    before { allow(::Kernel).to receive(:exit) }
-
     context 'when environments are empty' do
       before { allow(subject).to receive(:environments).and_return({}) }
       it 'should log and return' do
         expect(subject.send(:logger)).to receive(:warn).with(/No matching environments/)
-        subject.deploy!
-      end
-
-      it 'should exit with status code 1' do
-        expect(Kernel).to receive(:exit).with(1)
         subject.deploy!
       end
     end
