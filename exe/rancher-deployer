@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'rancher_deployer'
+
+deployer = RancherDeployer::Deployer.new
+deployer.deploy!

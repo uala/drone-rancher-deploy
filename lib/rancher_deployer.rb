@@ -40,7 +40,7 @@ module RancherDeployer
         image_prefix = config.fetch('image_prefix', 'drone')
         branch_slug  = ENV['DRONE_SOURCE_BRANCH'].to_s.gsub(/\/+/, '-')
         short_sha    = ENV['DRONE_COMMIT_SHA'].to_s[0, 8]
-        repo         = ENV['DRONE_REPO'].downcase
+        repo         = ENV['DRONE_REPO'].to_s.downcase
         "#{repo}:#{image_prefix}-#{branch_slug}-#{short_sha}"
       end
     end
