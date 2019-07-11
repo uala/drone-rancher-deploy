@@ -15,3 +15,6 @@ sample-config.yml
 sample-env
 # Ruby and IDE stuff
 .idea/
+
+# Since it's a gem ignore Gemfile.lock
+Gemfile.lock
