@@ -40,6 +40,13 @@ def shell
   @_cmd ||= TTY::Command.new(logger: logger, dry_run: dry_run?, color: color?)
 end
 
+def echo_1
+  StringIO.new.tap do |st|
+    st.puts '1'
+    st.rewind
+  end
+end
+
 # Check current branch
 current_branch = ENV['DRONE_SOURCE_BRANCH']
 logger.debug %Q{Running plugin for branch "#{current_branch}"}
@@ -67,8 +74,8 @@ end
 environments.each do |name, config|
   logger.debug "Running on agent #{ENV['DRONE_MACHINE']}, deploying to project #{config['project']} at #{config['server_url']}"
   # Login command
-  logger.info "Logging in to rancher at #{config['server_url']}"
-  shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}")
+  logger.info "Logging in to rancher at #{config['server_url']} and selecting first project"
+  shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}", in: echo_1)
   # Context switch
   context_command = %Q{rancher context switch #{config['project']}}
   logger.info "Switching context to #{config['project']}"
