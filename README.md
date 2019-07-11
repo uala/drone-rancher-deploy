@@ -1,5 +1,7 @@
 # Drone Rancher Deploy
 
+[![Build Status](https://drone.uala.dev/api/badges/uala/drone-rancher-deploy/status.svg)](https://drone.uala.dev/uala/drone-rancher-deploy)
+
 This [drone plugin](https://drone.io/) can be used to deploy images on a Kubernetes cluster with Rancher 2.x.
 
 Plugin in action:
