@@ -1,0 +1,13 @@
+---
+kind: pipeline
+name: rspec
+
+steps:
+  - name: rspec
+    image: ruby:2.6.2
+    commands:
+      - echo "Running on agent $DRONE_MACHINE"
+      - gem install bundler -v 1.17.2
+      - bundle install
+      - bundle exec rake
+
