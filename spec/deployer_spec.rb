@@ -118,7 +118,7 @@ RSpec.describe RancherDeployer::Deployer do
       it 'should login to rancher sending echo_1 command' do
         expect(shell).to receive(:run).with(
             'rancher login', 'https://k8s.example.com', '-t', 'access_key:secret_key',
-            in: an_instance_of(StringIO)
+            in: an_instance_of(StringIO), only_output_on_error: true
         )
         subject.deploy!
       end
