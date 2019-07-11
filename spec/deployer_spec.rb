@@ -83,6 +83,65 @@ RSpec.describe RancherDeployer::Deployer do
     end
   end
 
+  describe '#deploy!' do
+    before { allow(::Kernel).to receive(:exit) }
+
+    context 'when environments are empty' do
+      before { allow(subject).to receive(:environments).and_return({}) }
+      it 'should log and return' do
+        expect(subject.send(:logger)).to receive(:warn).with(/No matching environments/)
+        subject.deploy!
+      end
+
+      it 'should exit with status code 1' do
+        expect(Kernel).to receive(:exit).with(1)
+        subject.deploy!
+      end
+    end
+
+    context 'with matching environments' do
+      let(:shell) { double(:shell).as_null_object }
+      let(:config) do
+        {
+            'server_url' => "https://k8s.example.com",
+            'project'    => 'MyCoolProject',
+            'namespace'  => 'backend',
+            'access_key' => 'access_key',
+            'secret_key' => 'secret_key',
+            'services'   => %w[web worker]
+        }
+      end
+      before { allow(subject).to receive(:environments).and_return('some' => config) }
+      before { allow(subject).to receive(:image_name).and_return('image:tag') }
+      before { allow(subject).to receive(:shell).and_return(shell) }
+
+      it 'should login to rancher sending echo_1 command' do
+        expect(shell).to receive(:run).with(
+            'rancher login', 'https://k8s.example.com', '-t', 'access_key:secret_key',
+            in: an_instance_of(StringIO)
+        )
+        subject.deploy!
+      end
+
+      it 'should switch context to given project' do
+        expect(shell).to receive(:run).with('rancher', 'context', 'switch', config['project'])
+        subject.deploy!
+      end
+
+      it 'should update individual services' do
+        expect(shell).to receive(:run).with(
+            'rancher kubectl set image deployment web web=image:tag',
+            '-n', 'backend'
+        )
+        expect(shell).to receive(:run).with(
+            'rancher kubectl set image deployment worker worker=image:tag',
+            '-n', 'backend'
+        )
+        subject.deploy!
+      end
+    end
+  end
+
   describe '#image_name' do
     context 'when set in config' do
       before { allow(subject).to receive(:config).and_return('image' => 'some:latest') }
