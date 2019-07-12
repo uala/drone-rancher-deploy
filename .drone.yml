@@ -7,6 +7,10 @@ steps:
     image: docker:git
     commands:
       - git fetch --tags
+      # Need to checkout master, remember current branch
+      - CURRENT_BRANCH=git branch --show-current
+      - git checkout master
+      - git checkout $CURRENT_BRANCH # Going back
   - name: rspec
     image: ruby:2.6.2
     commands:
