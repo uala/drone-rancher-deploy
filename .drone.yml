@@ -3,6 +3,10 @@ kind: pipeline
 name: rspec
 
 steps:
+  - name: fetch-tags
+    image: docker:git
+    commands:
+      - git fetch --tags
   - name: rspec
     image: ruby:2.6.2
     commands:
