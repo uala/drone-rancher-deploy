@@ -37,6 +37,27 @@ RSpec.describe RancherDeployer::TagChecker do
     end
   end
 
+  describe '#branches_for_tag' do
+    let(:tag) { 'demo-tag' }
+    it 'should return branches that contains the given tag' do
+      expect(subject.branches_for_tag(tag)).to include('master')
+    end
+
+    context 'with merged branches' do
+      let(:tag) { '0b93b01' } # Works with any ref also plain commits
+      it 'should return branches that contains the given tag' do
+        expect(subject.branches_for_tag(tag)).to include('master')
+      end
+    end
+
+    context 'when tagging outside of master' do
+      let(:tag) { 'bad-tag' }
+      it 'should not include master' do
+        expect(subject.branches_for_tag(tag)).not_to include('master')
+      end
+    end
+  end
+
   describe '#enforce_tag_on_branch?' do
     context 'when plugin option is not present' do
       it 'should be falsey' do

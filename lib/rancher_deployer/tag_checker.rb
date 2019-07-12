@@ -27,12 +27,12 @@ module RancherDeployer
       logger.debug "Check passed, all done"
     end
 
-    private
-
     def branches_for_tag(tag_name)
-      []
+      `git branch --contains #{tag_name}`.split(/\s+/)
     end
 
+    private
+    
     def current_tag
       ENV['DRONE_TAG']
     end
