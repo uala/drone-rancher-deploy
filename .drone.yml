@@ -3,6 +3,14 @@ kind: pipeline
 name: rspec
 
 steps:
+  - name: fetch-tags
+    image: docker:git
+    commands:
+      - git fetch --tags
+      # Need to checkout master, remember current branch
+      - git branch --show-current > .current-branch
+      - git checkout master
+      - git checkout `cat .current-branch` # Going back
   - name: rspec
     image: ruby:2.6.2
     commands:

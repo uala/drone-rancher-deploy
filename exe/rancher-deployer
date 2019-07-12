@@ -2,5 +2,13 @@
 
 require 'rancher_deployer'
 
-deployer = RancherDeployer::Deployer.new
-deployer.deploy!
+action = ENV.fetch('PLUGIN_ACTION', 'deploy').to_sym
+
+case action
+when :deploy
+  deployer = RancherDeployer::Deployer.new
+  deployer.deploy!
+when :tag_check
+  tag_checker = RancherDeployer::TagChecker.new
+  tag_checker.check!
+end
