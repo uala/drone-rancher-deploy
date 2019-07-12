@@ -1,4 +1,5 @@
 require 'rancher_deployer/version'
+require 'rancher_deployer/tag_checker'
 require 'yaml'
 require 'erb'
 require 'logger'
