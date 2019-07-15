@@ -136,32 +136,34 @@ RSpec.describe RancherDeployer::Deployer do
   end
 
   describe '#image_name' do
+    let(:env_name) { 'some-env' }
     context 'when set in config' do
-      before { allow(subject).to receive(:config).and_return('image' => 'some:latest') }
+      let(:env_config) { {'image' => 'some:latest'} }
       it 'should return that value' do
-        expect(subject.image_name).to eq('some:latest')
+        expect(subject.image_name(env_config, env_name)).to eq('some:latest')
       end
     end
 
     context 'when not set' do
+      let(:env_config) { Hash.new }
       before { stub_env 'DRONE_REPO', 'fabn/example' }
       before { stub_env 'DRONE_COMMIT_SHA', '1234567890' }
       before { stub_env 'DRONE_SOURCE_BRANCH', 'develop' }
       it 'should build from ENV variables' do
-        expect(subject.image_name).to eq('fabn/example:drone-develop-12345678')
+        expect(subject.image_name(env_config, env_name)).to eq('fabn/example:drone-develop-12345678')
       end
 
       context 'when repo contains uppercase chars' do
         before { stub_env 'DRONE_REPO', 'fabn/Example' }
         it 'should downcase them' do
-          expect(subject.image_name).to start_with('fabn/example')
+          expect(subject.image_name(env_config, env_name)).to start_with('fabn/example')
         end
       end
 
       context 'when branch contains slashes' do
         before { stub_env 'DRONE_SOURCE_BRANCH', 'feature/foo' }
         it 'should remove from tag name' do
-          expect(subject.image_name).to include('feature-foo')
+          expect(subject.image_name(env_config, env_name)).to include('feature-foo')
         end
       end
     end

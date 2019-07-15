@@ -36,8 +36,9 @@ module RancherDeployer
     end
 
     # Image name to use for new deployment
-    def image_name
-      @__image_name ||= config.fetch('image') do
+    def image_name(env_config, env_name)
+      env_config.fetch('image') do
+        logger.debug %Q{No image provided in config for #{env_name}, will build image name from env variables}
         image_prefix = config.fetch('image_prefix', 'drone')
         branch_slug  = ENV['DRONE_SOURCE_BRANCH'].to_s.gsub(/\/+/, '-')
         short_sha    = ENV['DRONE_COMMIT_SHA'].to_s[0, 8]
@@ -65,7 +66,7 @@ module RancherDeployer
       # Actual deploy
       logger.info "Will deploy to environment(s): #{environments.keys}"
       # Iterate through configurations and deploy services
-      environments.each do |_, config|
+      environments.each do |name, config|
         logger.debug "Running on agent #{ENV['DRONE_MACHINE']}, deploying to project #{config['project']} at #{config['server_url']}"
         # Login command
         logger.info "Logging in to rancher at #{config['server_url']} and selecting first project"
@@ -74,10 +75,11 @@ module RancherDeployer
         logger.info "Switching context to #{config['project']}"
         shell.run('rancher', 'context', 'switch', config['project'])
         # Deploy services
-        logger.info "Updating services: #{config['services']} with image '#{image_name}'"
+        image_to_deploy = image_name(config, name)
+        logger.info "Updating services: #{config['services']} with image '#{image_to_deploy}'"
         config['services'].each do |service|
           logger.debug "Updating service #{service}"
-          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_name}", '-n', config['namespace'])
+          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy}", '-n', config['namespace'])
         end
       end
     end
