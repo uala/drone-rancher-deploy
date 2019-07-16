@@ -3,13 +3,6 @@ kind: pipeline
 name: rspec
 
 steps:
-  - name: Build docker image
-    image: plugins/docker
-    settings:
-      repo: ${DRONE_REPO}
-      tags:
-        - ${DRONE_COMMIT_SHA:0:8}
-        - latest
   - name: Fetch all tags
     image: docker:git
     commands:
@@ -19,8 +12,10 @@ steps:
       - git checkout master
       - git checkout `cat .current-branch` # Going back
   - name: rspec
-    image: ${DRONE_REPO}:latest
+    image: ruby:2.6.2
     commands:
+      - apt-get update -qq
+      - apt-get install cmake zlib1g zlib1g-dev -y
       - echo "Running on agent $DRONE_MACHINE"
       - gem install bundler -v 1.17.2
       - bundle install
