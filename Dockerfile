@@ -5,6 +5,11 @@ FROM ruby:2.6.2
 COPY --from=ranchercli /usr/local/bin/kubectl /usr/local/bin
 COPY --from=ranchercli /usr/bin/rancher /usr/local/bin
 
+# Install rugged dependencies
+RUN apt-get update -qq \
+    && apt-get install cmake zlib1g zlib1g-dev -y \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN gem install bundler -v 1.17.2
 
 ENV GEM_HOME="/usr/local/bundle"
