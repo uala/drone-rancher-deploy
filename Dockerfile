@@ -7,7 +7,7 @@ COPY --from=ranchercli /usr/bin/rancher /usr/local/bin
 
 # Install rugged dependencies
 RUN apt-get update -qq \
-    && apt-get install cmake zlib1g zlib1g-dev -y \
+    && apt-get install cmake zlib1g zlib1g-dev libssh2-1-dev -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN gem install bundler -v 1.17.2
