@@ -3,7 +3,14 @@ kind: pipeline
 name: rspec
 
 steps:
-  - name: fetch-tags
+  - name: Build docker image
+    image: plugins/docker
+    settings:
+      repo: ${DRONE_REPO}
+      tags:
+        - ${DRONE_COMMIT_SHA:0:8}
+        - latest
+  - name: Fetch all tags
     image: docker:git
     commands:
       - git fetch --tags
@@ -12,7 +19,7 @@ steps:
       - git checkout master
       - git checkout `cat .current-branch` # Going back
   - name: rspec
-    image: ruby:2.6.2
+    image: ${DRONE_REPO}:latest
     commands:
       - echo "Running on agent $DRONE_MACHINE"
       - gem install bundler -v 1.17.2
