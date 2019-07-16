@@ -28,11 +28,19 @@ module RancherDeployer
     end
 
     def branches_for_tag(tag_name)
-      `git branch --contains #{tag_name}`.split(/\s+/)
+      @branches ||= begin
+        repo = Rugged::Repository.new(Dir.pwd)
+        repo.remotes['origin'].fetch if fetch?
+        repo.branches.select { |branch| repo.descendant_of?(branch.target, tag_name) }.map(&:name)
+      end
     end
 
     private
-    
+
+    def fetch?
+      !ENV['PLUGIN_FETCH'].to_s.empty?
+    end
+
     def current_tag
       ENV['DRONE_TAG']
     end

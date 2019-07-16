@@ -4,6 +4,7 @@ require 'yaml'
 require 'erb'
 require 'logger'
 require 'tty-command'
+require 'rugged'
 
 module RancherDeployer
   class Error < StandardError;
