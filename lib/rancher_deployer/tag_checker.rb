@@ -18,7 +18,7 @@ module RancherDeployer
         logger.info 'Tag checking not enabled, everything is ok' and return true
       end
       # Get branchs for current tag
-      branches_for_tag = branches_for_tag(current_commit)
+      branches_for_tag = branches_for_tag(current_commit).map { |br| br.sub(%r{^origin/}, '') }.uniq
       logger.info "Checking if tag: #{current_tag} (#{current_commit}) is included in #{branches_for_tag}"
       unless branches_for_tag.include?(requested_branch)
         logger.error "User has requested that tag should be on branch #{requested_branch}, it only was in #{branches_for_tag}"
