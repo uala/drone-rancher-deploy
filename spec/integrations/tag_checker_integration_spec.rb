@@ -11,7 +11,7 @@ RSpec.describe RancherDeployer::TagChecker do
     # Initialize git repo with bare git commands
     shell = TTY::Command.new(output: Logger.new('/dev/null'))
     shell.run('git init .', chdir: repo_path, only_output_on_error: true)
-    shell.run('git remote add origin https://github.com/fabn/draw-with-git', chdir: repo_path)
+    shell.run("git remote add origin #{repo}", chdir: repo_path)
     shell.run("git fetch origin +refs/#{reference}:", chdir: repo_path)
     shell.run('git checkout -qf FETCH_HEAD', chdir: repo_path)
   end
