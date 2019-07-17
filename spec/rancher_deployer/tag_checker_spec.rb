@@ -34,16 +34,6 @@ RSpec.describe RancherDeployer::TagChecker do
             expect(::Kernel).to have_received(:exit).with(1)
           end
         end
-
-        context 'when tag is on remote branches' do
-          before { stub_env 'PLUGIN_ENFORCE_BRANCH_FOR_TAG', 'some-remote-branch' }
-
-          it 'should compare also on remote branch names' do
-            expect(subject).to receive(:branches_for_tag).and_return(['origin/some-remote-branch'])
-            subject.check!
-            expect(::Kernel).not_to have_received(:exit).with(1)
-          end
-        end
       end
     end
   end
@@ -75,7 +65,7 @@ RSpec.describe RancherDeployer::TagChecker do
       it 'should include remote branches' do
         branches_for_remote_tag = subject.branches_for_tag(tag)
         expect(branches_for_remote_tag).not_to be_empty
-        expect(branches_for_remote_tag).to include('origin/remote-branch-only')
+        expect(branches_for_remote_tag).to include('remote-branch-only')
       end
     end
   end

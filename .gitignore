@@ -18,3 +18,7 @@ sample-env
 
 # Since it's a gem ignore Gemfile.lock
 Gemfile.lock
+
+# Used in integration tests
+draw-with-git/
+

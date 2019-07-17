@@ -4,11 +4,6 @@ require 'logger'
 module RancherDeployer
 
   class TagChecker
-    # attr_reader :logger, :config, :current_branch
-
-    def initialize
-    end
-
     def enforce_tag_on_branch?
       on_tag? && !requested_branch.to_s.empty?
     end
@@ -18,7 +13,7 @@ module RancherDeployer
         logger.info 'Tag checking not enabled, everything is ok' and return true
       end
       # Get branchs for current tag
-      branches_for_tag = branches_for_tag(current_commit).map { |br| br.sub(%r{^origin/}, '') }.uniq
+      branches_for_tag = branches_for_tag(current_commit)
       logger.info "Checking if tag: #{current_tag} (#{current_commit}) is included in #{branches_for_tag}"
       unless branches_for_tag.include?(requested_branch)
         logger.error "User has requested that tag should be on branch #{requested_branch}, it only was in #{branches_for_tag}"
@@ -36,7 +31,8 @@ module RancherDeployer
         logger.debug "Inspecting repo at #{repo.path}, branches are #{repo.branches.map(&:name)}"
         # descendant_of? does not return true for it self, i.e. repo.descendant_of?(x, x) will return false for every commit
         # @see https://github.com/libgit2/libgit2/pull/4362
-        repo.branches.select { |branch| repo.descendant_of?(branch.target, full_sha) || full_sha == branch.target_id }.map(&:name)
+        repo.branches.select { |branch| repo.descendant_of?(branch.target_id, full_sha) || full_sha == branch.target_id }
+            .map(&:name).map { |br| br.sub(%r{^origin/}, '') }.uniq # Remove the origin/ prefix from branch names
       end
     end
 
