@@ -119,7 +119,7 @@ module RancherDeployer
     def logger
       @_logger ||= begin
         Logger.new($stdout).tap do |l|
-          l.level = ENV.fetch('PLUGIN_LOGGING', 'debug')
+          l.level = ENV.fetch('PLUGIN_LOGGING', 'info')
         end
       end
     end
