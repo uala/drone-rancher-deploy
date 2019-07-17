@@ -27,11 +27,16 @@ module RancherDeployer
       logger.debug "Check passed, all done"
     end
 
-    def branches_for_tag(tag_name)
+    def branches_for_tag(tag_name, repo_path = Dir.pwd)
       @branches ||= begin
-        repo = Rugged::Repository.new(Dir.pwd)
+        repo = Rugged::Repository.new(repo_path)
         repo.remotes['origin'].fetch if fetch?
-        repo.branches.select { |branch| repo.descendant_of?(branch.target, tag_name) }.map(&:name)
+        # Convert tag to sha1 if matching tag found
+        full_sha = repo.tags[tag_name] ? repo.tags[tag_name].target_id : tag_name
+        logger.debug "Inspecting repo at #{repo.path}, branches are #{repo.branches.map(&:name)}"
+        # descendant_of? does not return true for it self, i.e. repo.descendant_of?(x, x) will return false for every commit
+        # @see https://github.com/libgit2/libgit2/pull/4362
+        repo.branches.select { |branch| repo.descendant_of?(branch.target, full_sha) || full_sha == branch.target_id }.map(&:name)
       end
     end
 

@@ -53,7 +53,18 @@ RSpec.describe RancherDeployer::TagChecker do
     context 'when tagging outside of master' do
       let(:tag) { 'bad-tag' }
       it 'should not include master' do
-        expect(subject.branches_for_tag(tag)).not_to include('master')
+        branches_for_bad_tag = subject.branches_for_tag(tag)
+        expect(branches_for_bad_tag).not_to be_empty
+        expect(branches_for_bad_tag).not_to include('master')
+      end
+    end
+
+    context 'with remote only branches' do
+      let(:tag) { 'only-remote' }
+      it 'should include remote branches' do
+        branches_for_remote_tag = subject.branches_for_tag(tag)
+        expect(branches_for_remote_tag).not_to be_empty
+        expect(branches_for_remote_tag).to include('origin/remote-branch-only')
       end
     end
   end
