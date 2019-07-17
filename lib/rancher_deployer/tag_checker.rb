@@ -47,11 +47,10 @@ module RancherDeployer
     private
 
     def update_remote!(repo)
-      return unless require_authentication?
-      logger.debug "Checking authentication against repo at #{ENV['DRONE_REPO']}"
+      logger.debug "Checking fetch connection against repo at #{ENV['DRONE_REPO']} (required authentication: #{require_authentication?})"
       credentials = rugged_credentials(git_credentials)
       if repo.remotes['origin'].check_connection(:fetch, credentials: credentials)
-        logger.debug 'Authentication succeded, fetching all refs in origin'
+        logger.info 'Connection succeded, fetching all refs in origin'
         repo.remotes['origin'].fetch(credentials: credentials)
         logger.info "Fetched all refs from remote repository at #{ENV['DRONE_REPO']}"
       end

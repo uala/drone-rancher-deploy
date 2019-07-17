@@ -2,7 +2,6 @@ RSpec.describe RancherDeployer::TagChecker do
   before { stub_env 'PLUGIN_LOGGING', 'error' }
 
   # Stub methods used to guard remote fetch
-  before { allow_any_instance_of(described_class).to receive(:require_authentication?).and_return(true) }
   before { allow_any_instance_of(described_class).to receive(:fetch?).and_return(true) }
 
   def clone_as_drone_io(repo_path, reference, repo: 'https://github.com/fabn/draw-with-git')
