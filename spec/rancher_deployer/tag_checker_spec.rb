@@ -91,4 +91,17 @@ RSpec.describe RancherDeployer::TagChecker do
       end
     end
   end
+
+  describe '#git_credentials' do
+    let(:stubbed_file) { File.realpath("#{__dir__}/netrc.example") }
+    before { FileUtils.chmod(0600, stubbed_file) }
+    before { allow(subject).to receive(:credentials_file).and_return(stubbed_file) }
+
+    it 'should parse netrc file' do
+      credentials = subject.git_credentials
+      expect(credentials).to be_an_instance_of(Netrc::Entry)
+      expect(credentials.login).to match %r{^\h{40}$}
+      expect(credentials.password).to eq('x-oauth-basic')
+    end
+  end
 end

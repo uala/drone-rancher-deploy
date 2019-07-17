@@ -1,0 +1,4 @@
+# Random token as in drone auth
+machine github.com
+  login 0a9e808c451a576428448799e33969eaf52380c3
+  password x-oauth-basic

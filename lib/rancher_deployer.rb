@@ -5,6 +5,7 @@ require 'erb'
 require 'logger'
 require 'tty-command'
 require 'rugged'
+require 'netrc'
 
 module RancherDeployer
   class Error < StandardError;

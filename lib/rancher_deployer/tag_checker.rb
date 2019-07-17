@@ -19,13 +19,13 @@ module RancherDeployer
         logger.error "User has requested that tag should be on branch #{requested_branch}, it only was in #{branches_for_tag}"
         ::Kernel.exit(1)
       end
-      logger.debug "Check passed, all done"
+      logger.debug 'Check passed, all done'
     end
 
     def branches_for_tag(tag_name, repo_path = Dir.pwd)
       @branches ||= begin
         repo = Rugged::Repository.new(repo_path)
-        repo.remotes['origin'].fetch if fetch?
+        update_remote! if fetch?
         # Convert tag to sha1 if matching tag found
         full_sha = repo.tags[tag_name] ? repo.tags[tag_name].target_id : tag_name
         logger.debug "Inspecting repo at #{repo.path}, branches are #{repo.branches.map(&:name)}"
@@ -36,7 +36,40 @@ module RancherDeployer
       end
     end
 
+    def git_credentials
+      @git_credentials ||= begin
+        credentials = Netrc.read(credentials_file)['github.com']
+        logger.debug "Successfully parsed credentials from #{credentials_file}" if credentials
+        credentials
+      end
+    end
+
     private
+
+    def update_remote!
+      return unless require_authentication?
+      logger.debug "Checking authentication against repo at #{ENV['DRONE_REPO']}"
+      credentials = rugged_credentials(git_credentials)
+      if repo.remotes['origin'].check_connection(:fetch, credentials: credentials)
+        logger.debug 'Authentication succeded, fetching all refs in origin'
+        repo.remotes['origin'].fetch(credentials: credentials)
+        logger.info "Fetched all refs from remote repository at #{ENV['DRONE_REPO']}"
+      end
+    end
+
+    def rugged_credentials(credentials)
+      credentials ?
+          Rugged::Credentials::UserPassword.new(username: credentials.login, password: credentials.password) :
+          Rugged::Credentials::Default.new # Empty set of credentials
+    end
+    
+    def require_authentication?
+      ENV['DRONE_REPO_PRIVATE'] && File.exists?(File.expand_path('~/.netrc'))
+    end
+
+    def credentials_file
+      File.expand_path('~/.netrc')
+    end
 
     def fetch?
       !ENV['PLUGIN_FETCH'].to_s.empty?
