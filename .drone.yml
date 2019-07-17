@@ -13,8 +13,6 @@ steps:
       - git checkout `cat .current-branch` # Going back
   - name: rspec
     image: ruby:2.6.2
-    environment:
-      INTEGRATION_SPEC: true
     commands:
       - apt-get update -qq
       - apt-get install cmake zlib1g zlib1g-dev -y

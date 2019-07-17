@@ -25,7 +25,7 @@ module RancherDeployer
     def branches_for_tag(tag_name, repo_path = Dir.pwd)
       @branches ||= begin
         repo = Rugged::Repository.new(repo_path)
-        update_remote! if fetch?
+        update_remote!(repo) if fetch?
         # Convert tag to sha1 if matching tag found
         full_sha = repo.tags[tag_name] ? repo.tags[tag_name].target_id : tag_name
         logger.debug "Inspecting repo at #{repo.path}, branches are #{repo.branches.map(&:name)}"
@@ -46,7 +46,7 @@ module RancherDeployer
 
     private
 
-    def update_remote!
+    def update_remote!(repo)
       return unless require_authentication?
       logger.debug "Checking authentication against repo at #{ENV['DRONE_REPO']}"
       credentials = rugged_credentials(git_credentials)
