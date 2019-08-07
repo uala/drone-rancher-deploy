@@ -45,6 +45,7 @@ module RancherDeployer
     end
 
     def tag_is_on_head?(tag_name, head = requested_branch, repo_path = Dir.pwd)
+      logger.info "Checking if tag #{tag_name} matches with branch #{head} HEAD"
       repo = Rugged::Repository.new(repo_path)
       update_remote!(repo) if fetch?
       full_sha = repo.tags[tag_name] ? repo.tags[tag_name].target_id : tag_name
