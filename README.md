@@ -94,6 +94,27 @@ It's advised to customize image name. Remember: you can use ERB in YAML config, 
 image: <%= "#{ENV['DRONE_REPO']}:ENV['DRONE_BRANCH']" %>
 ```
 
+### Tag check action
+
+This plugin action is used to enforce that deployments of tags happens in a restricted branch.
+To use this feature you should configure the plugin in the following way
+ 
+```yaml
+steps:
+  - name: rancher-deploy
+    image: uala/drone-rancher-deploy
+    settings:
+      action: tag_check
+      enforce_branch_for_tag: <some-branch-name>
+      enforce_head: true # Optional, default is false            
+``` 
+
+With this configuration plugin will check on what branches is the tag you're deploying
+and fails if tag is not on the given branch. With optional `enforce_head` flag plugin
+will also ensure that tag point to head of the given branch.
+
+See integrations specs for this behavior.  
+
 ### Plugin settings
 
 The plugin accepts the following settings:
@@ -102,6 +123,9 @@ The plugin accepts the following settings:
 * `dry_run`: setting this value to any non emmpty string will enable plugin dry-run mode, i.e. commands will printed to screen but they won't be executed 
 * `colors`: can be used to disable colored output from executed commands. Default is true, setting it to `false` will disable colors.
 * `logging`: logging level of plugin, default is `debug`, supported values: [any Ruby logger valid level](https://ruby-doc.org/stdlib-2.4.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description)
+* `action`: action to use in plugin, one of `[deploy, tag_check]`
+* `enforce_branch_for_tag`: string, a branch name, used in `tag_check` action
+* `enforce_head`: boolean any non empty string will be considered as `true`, used in `tag_check` action 
 
 ## Development
 

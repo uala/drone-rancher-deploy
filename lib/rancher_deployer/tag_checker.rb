@@ -8,6 +8,10 @@ module RancherDeployer
       on_tag? && !requested_branch.to_s.empty?
     end
 
+    def enforce_head?
+      enforce_tag_on_branch? && !ENV.fetch('PLUGIN_ENFORCE_HEAD', nil).to_s.empty?
+    end
+
     def check!
       unless enforce_tag_on_branch?
         logger.info 'Tag checking not enabled, everything is ok' and return true
@@ -17,6 +21,10 @@ module RancherDeployer
       logger.info "Checking if tag: #{current_tag} (#{current_commit}) is included in #{branches_for_tag}"
       unless branches_for_tag.include?(requested_branch)
         logger.error "User has requested that tag should be on branch #{requested_branch}, it only was in #{branches_for_tag}"
+        ::Kernel.exit(1)
+      end
+      if enforce_head? && !tag_is_on_head?(current_tag, requested_branch)
+        logger.error "User has requested that tag #{current_tag} should be on head of branch #{requested_branch}, it was not, skipping deployment"
         ::Kernel.exit(1)
       end
       logger.debug 'Check passed, all done'
@@ -34,6 +42,14 @@ module RancherDeployer
         repo.branches.select { |branch| repo.descendant_of?(branch.target_id, full_sha) || full_sha == branch.target_id }
             .map(&:name).map { |br| br.sub(%r{^origin/}, '') }.uniq # Remove the origin/ prefix from branch names
       end
+    end
+
+    def tag_is_on_head?(tag_name, head = requested_branch, repo_path = Dir.pwd)
+      repo = Rugged::Repository.new(repo_path)
+      update_remote!(repo) if fetch?
+      full_sha = repo.tags[tag_name] ? repo.tags[tag_name].target_id : tag_name
+      branch_sha = (repo.branches[head] || repo.branches["origin/#{head}"]).target_id
+      full_sha == branch_sha
     end
 
     def git_credentials
