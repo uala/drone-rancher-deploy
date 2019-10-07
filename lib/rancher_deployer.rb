@@ -81,7 +81,7 @@ module RancherDeployer
         logger.info "Updating services: #{config['services']} with image '#{image_to_deploy}'"
         config['services'].each do |service|
           logger.debug "Updating service #{service}"
-          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy}", '-n', config['namespace'])
+          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy} #{ENV['PLUGIN_KUBECTL_FLAGS']}", '-n', config['namespace'])
         end
       end
     end
