@@ -122,7 +122,7 @@ The plugin accepts the following settings:
 * `config`: mandatory setting, a file path (relative to your repository root) containing environments configuration
 * `dry_run`: setting this value to any non emmpty string will enable plugin dry-run mode, i.e. commands will printed to screen but they won't be executed 
 * `colors`: can be used to disable colored output from executed commands. Default is true, setting it to `false` will disable colors.
-* `logging`: logging level of plugin, default is `debug`, supported values: [any Ruby logger valid level](https://ruby-doc.org/stdlib-2.4.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description)
+* `logging`: logging level of plugin, default is `info`, supported values: [any Ruby logger valid level](https://ruby-doc.org/stdlib-2.4.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description)
 * `action`: action to use in plugin, one of `[deploy, tag_check]`
 * `enforce_branch_for_tag`: string, a branch name, used in `tag_check` action
 * `enforce_head`: boolean any non empty string will be considered as `true`, used in `tag_check` action 
