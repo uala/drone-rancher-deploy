@@ -88,6 +88,7 @@ configuration must be deployed. It supports plain branch names and also a regexp
 * `services`: YAML array of services to update in Rancher/K8S
 * `image`: Docker image used to update services, if not given a name will be built from repo/branch/commit.
 * `login_options`: Additional `rancher login` options (e.g. `--skip-verify`)
+* `kubectl_options`: optional, string, any additional flags to be passed to the kubectl command
  
 It's advised to customize image name. Remember: you can use ERB in YAML config, so you can set this to something like
 
@@ -127,7 +128,6 @@ The plugin accepts the following settings:
 * `action`: action to use in plugin, one of `[deploy, tag_check]`
 * `enforce_branch_for_tag`: string, a branch name, used in `tag_check` action
 * `enforce_head`: boolean any non empty string will be considered as `true`, used in `tag_check` action 
-* `kubectl_flags`: optional, string, any additional flags to be passed to the kubectl command
 
 ## Development
 

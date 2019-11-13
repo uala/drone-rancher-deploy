@@ -154,6 +154,32 @@ RSpec.describe RancherDeployer::Deployer do
         )
         subject.deploy!
       end
+
+      context 'with kubectl options' do
+        let(:config) do
+          {
+              'server_url'      => "https://k8s.example.com",
+              'project'         => 'MyCoolProject',
+              'namespace'       => 'backend',
+              'access_key'      => 'access_key',
+              'secret_key'      => 'secret_key',
+              'services'        => %w[web worker],
+              'kubectl_options' => '--insecure-skip-tls-verify'
+          }
+        end
+
+        it 'should update individual services' do
+          expect(shell).to receive(:run).with(
+              'rancher kubectl set image deployment web web=image:tag --insecure-skip-tls-verify',
+              '-n', 'backend'
+          )
+          expect(shell).to receive(:run).with(
+              'rancher kubectl set image deployment worker worker=image:tag --insecure-skip-tls-verify',
+              '-n', 'backend'
+          )
+          subject.deploy!
+        end
+      end
     end
   end
 
