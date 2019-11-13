@@ -110,10 +110,32 @@ RSpec.describe RancherDeployer::Deployer do
 
       it 'should login to rancher sending echo_1 command' do
         expect(shell).to receive(:run).with(
-            'rancher login', 'https://k8s.example.com', '-t', 'access_key:secret_key',
+            'rancher login', 'https://k8s.example.com', '-t', 'access_key:secret_key', nil,
             in: an_instance_of(StringIO), only_output_on_error: true
         )
         subject.deploy!
+      end
+
+      context 'with login_options' do
+        let(:config) do
+          {
+              'server_url'    => "https://k8s.example.com",
+              'project'       => 'MyCoolProject',
+              'namespace'     => 'backend',
+              'access_key'    => 'access_key',
+              'secret_key'    => 'secret_key',
+              'services'      => %w[web worker],
+              'login_options' => '--skip-verify'
+          }
+        end
+
+        it 'should apply them to login command' do
+          expect(shell).to receive(:run).with(
+              'rancher login', 'https://k8s.example.com', '-t', 'access_key:secret_key', '--skip-verify',
+              in: an_instance_of(StringIO), only_output_on_error: true
+          )
+          subject.deploy!
+        end
       end
 
       it 'should switch context to given project' do

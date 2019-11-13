@@ -72,7 +72,7 @@ module RancherDeployer
         logger.debug "Running on agent #{ENV['DRONE_MACHINE']}, deploying to project #{config['project']} at #{config['server_url']}"
         # Login command
         logger.info "Logging in to rancher at #{config['server_url']} and selecting first project"
-        shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}", in: echo_1, only_output_on_error: true)
+        shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}", (config['login_options'] if config['login_options']), in: echo_1, only_output_on_error: true)
         # Context switch
         logger.info "Switching context to #{config['project']}"
         shell.run('rancher', 'context', 'switch', config['project'])

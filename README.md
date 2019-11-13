@@ -87,6 +87,7 @@ configuration must be deployed. It supports plain branch names and also a regexp
 * `secret_key`: Rancher secret key used for authentication
 * `services`: YAML array of services to update in Rancher/K8S
 * `image`: Docker image used to update services, if not given a name will be built from repo/branch/commit.
+* `login_options`: Additional `rancher login` options (e.g. `--skip-verify`)
  
 It's advised to customize image name. Remember: you can use ERB in YAML config, so you can set this to something like
 
