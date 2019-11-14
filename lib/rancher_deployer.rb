@@ -72,7 +72,7 @@ module RancherDeployer
         logger.debug "Running on agent #{ENV['DRONE_MACHINE']}, deploying to project #{config['project']} at #{config['server_url']}"
         # Login command
         logger.info "Logging in to rancher at #{config['server_url']} and selecting first project"
-        shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}", in: echo_1, only_output_on_error: true)
+        shell.run('rancher login', config['server_url'], '-t', "#{config['access_key']}:#{config['secret_key']}", (config['login_options'] if config['login_options']), in: echo_1, only_output_on_error: true)
         # Context switch
         logger.info "Switching context to #{config['project']}"
         shell.run('rancher', 'context', 'switch', config['project'])
@@ -81,7 +81,7 @@ module RancherDeployer
         logger.info "Updating services: #{config['services']} with image '#{image_to_deploy}'"
         config['services'].each do |service|
           logger.debug "Updating service #{service}"
-          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy}", '-n', config['namespace'])
+          shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy}#{" #{config['kubectl_options']}" if config['kubectl_options']}", '-n', config['namespace'])
         end
       end
     end
