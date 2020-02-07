@@ -83,6 +83,11 @@ module RancherDeployer
           logger.debug "Updating service #{service}"
           shell.run("rancher kubectl set image deployment #{service} #{service}=#{image_to_deploy}#{" #{config['kubectl_options']}" if config['kubectl_options']}", '-n', config['namespace'])
         end
+        # Wait for service to be up (i.e. successfully deployed and rolled out) in kubernetes
+        config['services'].each do |service|
+          logger.debug "Checking service #{service} is up and running at new version"
+          shell.run("rancher kubectl rollout status deployment/#{service} #{" #{config['kubectl_options']}" if config['kubectl_options']}", '-n', config['namespace'])
+        end
       end
     end
 
